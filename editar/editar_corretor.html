@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Corretor</title>
+    <link rel="stylesheet" href="../index_styles.css">
+</head>
+<body>
+    <h1>Editar Corretor</h1>
+    <form id="editarForm" action="../cadastro/update_corretor.php" method="POST">
+        <input type="hidden" id="editId" name="editId">
+        <label for="editName">Nome:</label>
+        <input type="text" id="editName" name="editName" required minlength="3">
+        <span id="editNameError" class="error"></span>
+        <br><br>
+
+        <label for="editCreci">CRECI:</label>
+        <input type="text" id="editCreci" name="editCreci" required minlength="3">
+        <span id="editCreciError" class="error"></span>
+        <br><br>
+
+        <label for="editCpf">CPF:</label>
+        <input type="text" id="editCpf" name="editCpf" required pattern="\d{11}" maxlength="11">
+        <span id="editCpfError" class="error"></span>
+        <br><br>
+
+        <button type="submit">Salvar</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            console.log('ID do corretor:', id); // Log para verificar o ID recebido
+            if (id) {
+                fetch(`../cadastro/listar_corretores.php?id=${id}`)
+                .then(response => response.json())
+                .then(corretores => {
+                    console.log('Dados dos corretores:', corretores); // Log para verificar dados do corretor
+                    const corretor = corretores.find(cor => cor.id == id);
+                    if (corretor) {
+                        document.getElementById('editId').value = corretor.id;
+                        document.getElementById('editName').value = corretor.name;
+                        document.getElementById('editCreci').value = corretor.creci;
+                        document.getElementById('editCpf').value = corretor.cpf;
+                    } else {
+                        console.error('Nenhum corretor encontrado com o ID fornecido.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar corretor:', error);
+                });
+            }
+        });
+
+        document.getElementById('editarForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let nameError = '';
+            let creciError = '';
+            let cpfError = '';
+            let isValid = true;
+
+            // Validar nome
+            const name = document.getElementById('editName').value;
+            if (name.length < 3) {
+                nameError = 'Nome precisa ter mais de 2 caracteres';
+                isValid = false;
+            }
+            document.getElementById('editNameError').textContent = nameError;
+
+            // Validar CRECI
+            const creci = document.getElementById('editCreci').value;
+            if (creci.length < 3) {
+                creciError = 'CRECI precisa ter mais de 2 caracteres';
+                isValid = false;
+            }
+            document.getElementById('editCreciError').textContent = creciError;
+
+            // Validar CPF
+            const cpf = document.getElementById('editCpf').value;
+            const cpfPattern = /^\d{11}$/;
+            if (!cpfPattern.test(cpf)) {
+                cpfError = 'CPF precisa ter 11 caracteres numéricos';
+                isValid = false;
+            }
+            document.getElementById('editCpfError').textContent = cpfError;
+
+            // Se o formulário não for válido, prevenir envio
+            if (!isValid) {
+                return;
+            }
+
+            // Exibir os dados que estão sendo enviados
+            console.log('Enviando dados:', {
+                id: document.getElementById('editId').value,
+                name,
+                creci,
+                cpf
+            });
+
+            // Enviar os dados via Ajax
+            const formData = new FormData(this);
+
+            fetch('../cadastro/update_corretor.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Resposta do servidor:', data);
+                showSuccessMessage('Dados atualizados com sucesso!');
+                window.location.href = '../index.html'; // Retornar à página inicial
+            })
+            .catch(error => {
+                showSuccessMessage('Erro ao atualizar dados: ' + error);
+            });
+        });
+
+        function showSuccessMessage(message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html>

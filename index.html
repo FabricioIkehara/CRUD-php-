@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Corretor</title>
+    <link rel="stylesheet" href="index_styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>Cadastro de Corretor</h1>
+        </div>
+        <form id="cadastroForm" action="cadastro/envio_cadastro.php" method="POST">
+            <div class="form-group">
+                <div class="input-group">
+                    <label for="cpf">CPF:</label>
+                    <input type="text" id="cpf" name="cpf" required pattern="\d{11}" maxlength="11" placeholder="Digite o CPF" style="font-style: italic;">
+                </div>
+                <div class="input-group">
+                    <label for="creci">CRECI:</label>
+                    <input type="text" id="creci" name="creci" required minlength="3" placeholder="Digite o CRECI" style="font-style: italic;">
+                </div>
+            </div>
+            <div class="input-full">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required minlength="3" placeholder="Digite o Nome" style="font-style: italic;">
+            </div>
+            <span id="nomeError" class="error"></span>
+            <span id="cpfError" class="error"></span>
+            <span id="creciError" class="error"></span>
+            <br><br>
+            <button type="submit">Enviar</button>
+        </form>
+        <span id="successMessage" class="success"></span>
+    </div>
+
+    <h2>Corretores Cadastrados</h2>
+    <table id="corretoresTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>CRECI</th>
+                <th>CPF</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Os dados serão inseridos aqui -->
+        </tbody>
+    </table>
+
+    <script>
+        function showSuccessMessage(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            setTimeout(() => {
+                successMessage.textContent = '';
+            }, 3000);
+        }
+
+        document.getElementById('cadastroForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let nomeError = '';
+            let creciError = '';
+            let cpfError = '';
+            let isValid = true;
+
+            // Validar nome
+            const nome = document.getElementById('nome').value;
+            if (nome.length < 3) {
+                nomeError = 'Nome precisa ter mais de 2 caracteres';
+                isValid = false;
+            }
+            document.getElementById('nomeError').textContent = nomeError;
+
+            // Validar CRECI
+            const creci = document.getElementById('creci').value;
+            if (creci.length < 3) {
+                creciError = 'CRECI precisa ter mais de 2 caracteres';
+                isValid = false;
+            }
+            document.getElementById('creciError').textContent = creciError;
+
+            // Validar CPF
+            const cpf = document.getElementById('cpf').value;
+            const cpfPattern = /^\d{11}$/;
+            if (!cpfPattern.test(cpf)) {
+                cpfError = 'CPF precisa ter 11 caracteres numéricos. Verifique novamente.';
+                isValid = false;
+            }
+            document.getElementById('cpfError').textContent = cpfError;
+
+            // Se o formulário não for válido, prevenir envio
+            if (!isValid) {
+                return;
+            }
+
+            // Enviar os dados via Ajax
+            const formData = new FormData(this);
+
+            // Exibir os dados que estão sendo enviados
+            for (var pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+            fetch('cadastro/envio_cadastro.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Resposta do servidor:', data);
+                showSuccessMessage('Cadastro realizado com sucesso!');
+                document.getElementById('cadastroForm').reset();
+                loadCorretores();
+            })
+            .catch(error => {
+                showSuccessMessage('Erro ao cadastrar: ' + error);
+            });
+        });
+
+        function loadCorretores() {
+            fetch('cadastro/listar_corretores.php')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector('#corretoresTable tbody');
+                tableBody.innerHTML = ''; // Limpar tabela antes de recarregar
+                data.forEach(corretor => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${corretor.id}</td>
+                        <td>${corretor.name}</td>
+                        <td>${corretor.creci}</td>
+                        <td>${corretor.cpf}</td>
+                        <td>
+                            <button class="editButton" data-id="${corretor.id}">Editar</button>
+                            <button class="deleteButton btn-12" data-id="${corretor.id}">
+                                <span>Deletar</span>
+                                <span>Confirmar</span>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Adicionar evento de clique nos botões de editar
+                document.querySelectorAll('.editButton').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        window.location.href = `editar/editar_corretor.html?id=${id}`;
+                    });
+                });
+
+                // Adicionar evento de clique nos botões de deletar
+                document.querySelectorAll('.deleteButton').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        if (confirm('Tem certeza que deseja deletar este corretor?')) {
+                            deleteCorretor(id);
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar corretores:', error);
+            });
+        }
+
+        // Função para deletar corretor
+        function deleteCorretor(id) {
+            fetch('cadastro/delete_corretor.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'id=' + id
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert('Corretor deletado com sucesso!');
+                loadCorretores();
+            })
+            .catch(error => {
+                alert('Erro ao deletar corretor: ' + error);
+            });
+        }
+
+        // Carregar a lista de corretores ao carregar a página
+        loadCorretores();
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Ajuste para garantir que o topo não seja cortado */
+    min-height: 100vh; /* Garante que a altura mínima da página seja 100% da altura da janela */
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: 20px; /* Adiciona espaçamento no topo */
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.input-group {
+    flex-basis: calc(50% - 5px); /* Ajusta a largura para considerar a margem */
+    margin-right: 10px; /* Adiciona margem à direita dos inputs */
+}
+
+.input-group:last-child {
+    margin-right: 20px; /* Remove a margem do último item para evitar deslocamento */
+}
+
+.input-full {
+    width: 97%;
+    margin-bottom: 10px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-style: italic; /* Estiliza os placeholders como itálico */
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%; /* Ocupa 100% da largura */
+    padding: .75rem 1.25rem;
+    border-radius: 10rem;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: .15rem;
+    transition: all .3s;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    background-color: #222222; /* Cor do botão */
+}
+
+button[type="submit"]::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #222222; /* Usar a mesma cor ou uma variável se estiver usando um preprocessador */
+    border-radius: 10rem;
+    z-index: -2;
+}
+
+button[type="submit"]::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background-color: #444444; /* Cor de contraste para hover */
+    transition: all .3s;
+    border-radius: 10rem;
+    z-index: -1;
+}
+
+button[type="submit"]:hover {
+    color: #fff;
+}
+
+button[type="submit"]:hover::before {
+    width: 100%;
+}
+
+.error {
+    color: red;
+    font-size: 0.9em;
+}
+
+.success {
+    color: green;
+    font-size: 1em;
+}
+
+table {
+    width: 100%;
+    max-width: 600px;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* Estilos para os botões de deletar e editar */
+.btn-12, .editButton {
+    position: relative;
+    border: none;
+    width: 60px; /* Ajusta o tamanho dos botões */
+    height: 30px;
+    line-height: 30px;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    margin-right: 5px; /* Espaçamento entre os botões */
+    vertical-align: middle; /* Garante que os botões estejam alinhados verticalmente */
+}
+
+.btn-12 {
+    background-color: #e74c3c; /* Cor vermelha para deletar */
+}
+
+.btn-12:hover {
+    background-color: #c0392b; /* Cor vermelha mais escura no hover */
+}
+
+.editButton {
+    background-color: #3498db; /* Cor azul para editar */
+}
+
+.editButton:hover {
+    background-color: #2980b9; /* Cor azul mais escura no hover */
+}

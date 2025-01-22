@@ -1,0 +1,9 @@
+body {
+    font-family: Arial, sans-serif;
+}
+.error {
+    color: red;
+}
+.success {
+    color: green;
+}
